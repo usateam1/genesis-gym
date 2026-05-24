@@ -651,20 +651,37 @@ function toggleFaq(el){
   item.classList.toggle('open')
 }
 
+// Telegram config
+const TG_TOKEN='8658196133:AAE77hV6fIsFA21C-RbRcpmuOR4ru0_vJec'
+const TG_CHAT='8571455593'
+
+async function sendToTelegram(text){
+  const url=`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`
+  await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_CHAT,text,parse_mode:'HTML'})})
+}
+
 // CTA submit
-function ctaSubmit(){
+async function ctaSubmit(){
   const phone=document.getElementById('cta-phone').value.trim()
   if(!phone){alert('Введите номер телефона!');return}
   const btn=document.querySelector('.cta .btn-main')
-  btn.textContent='✅ Заявка принята!'
-  btn.style.background='linear-gradient(135deg,#22c55e,#16a34a)'
+  btn.textContent='Отправляем...'
   btn.disabled=true
-  setTimeout(()=>{
-    btn.textContent='Записаться 🔥'
-    btn.style.background=''
+  const msg=`🏋️ <b>Новая заявка — Genesis Gym</b>\n\n📞 Телефон: <b>${phone}</b>\n🕐 Время: ${new Date().toLocaleString('ru-RU',{timeZone:'Asia/Tashkent'})}`
+  try{
+    await sendToTelegram(msg)
+    btn.textContent='✅ Заявка принята!'
+    btn.style.background='linear-gradient(135deg,#22c55e,#16a34a)'
+    setTimeout(()=>{
+      btn.textContent='Записаться 🔥'
+      btn.style.background=''
+      btn.disabled=false
+      document.getElementById('cta-phone').value=''
+    },3000)
+  }catch(e){
+    btn.textContent='Ошибка, попробуй снова'
     btn.disabled=false
-    document.getElementById('cta-phone').value=''
-  },3000)
+  }
 }
 </script>
 </body>
